@@ -1,4 +1,3 @@
-import {View, Text} from 'react-native';
 import React, {useContext} from 'react';
 import {
   Box,
@@ -10,6 +9,7 @@ import {
   Input,
   Link,
   VStack,
+  Text
 } from 'native-base';
 
 import {useNavigation} from '@react-navigation/native';
@@ -31,7 +31,7 @@ export default function LoginScreen() {
         email: 'johndoe@gmail.com',
         password: 'Secret123',
       },
-      onSubmit: (values) => login(values)
+      onSubmit: values => login(values),
     });
 
   const login = values => {
@@ -44,9 +44,9 @@ export default function LoginScreen() {
   };
   console.log(values);
   return (
-    <Center flex={'1'} bg="light.200">
+    <Center flex={'1'} bgColor="warmGray.5">
       <Box w={'90%'}>
-        <Heading color={'warmGray.50'} mb="1.5" fontWeight={'semibold'}>
+        <Heading mb="1.5" fontWeight={'semibold'}>
           Connexion
         </Heading>
         <VStack space={'2'}>
@@ -61,13 +61,15 @@ export default function LoginScreen() {
               onChangeText={handleChange('password')}
             />
           </FormControl>
-          <Button onPress={handleSubmit} colorScheme={'indigo'}>Se connecter</Button>
+          <Button onPress={handleSubmit} colorScheme={'amber'}>
+            Se connecter
+          </Button>
           <HStack justifyContent={'center'} mt="3">
             <Text>Pas encore membre ? </Text>
             <Link
               onPress={() => navigation.navigate('Registration')}
               _text={{
-                color: 'indigo.500',
+                color: 'amber.500',
                 fontWeight: 'medium',
                 fontSize: 'sm',
               }}>

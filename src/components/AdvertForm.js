@@ -78,18 +78,30 @@ export default function AdvertForm() {
       createdAt: serverTimestamp(),
       user_id: auth.currentUser.uid,
     }).then(newAdvert => {
-        const userDocRef = doc(db, 'users', auth.currentUser.uid);
-        const userAdColRef = collection(userDocRef, 'adverts');
-        const userAdDocRef = doc(userAdColRef, newAdvert.id);
-        setDoc(userAdDocRef, {
-          ...values,
-          available: Timestamp.fromDate(values.available),
-          expiration: Timestamp.fromDate(values.expiration),
-          createdAt: serverTimestamp(),
-        });
       console.log('nouveau', newAdvert.id);
     });
   };
+
+  const updateAds = (values, id) => {
+    // on récupère le document à modifier
+    const advertsDocRef = doc(db, 'adverts', id);
+    // on le modifier avec la méthode setDoc (possibilité d'utiliser un autre méthode)
+    // le merge est import sinon, les colonnes non présente dans values seront écrasées de la nouvelle version du document.
+    // j'ai ajouté la colonne updatedAt pour avoir une date de dernière modification
+    setDoc(
+      advertsRef,
+      {
+        ...values,
+        updatedAt: serverTimestamp(),
+      },
+      {
+        merge: true,
+      },
+    ).then(() => {
+      console.log('annonce modifiée avec succès');
+    });
+  };
+
   return (
     <Box>
       <Heading>Nouvel annonce</Heading>
@@ -140,7 +152,7 @@ export default function AdvertForm() {
             value: new Date(),
             onChange: expirationDateChange,
           })}
-        <Button onPress={handleSubmit} mt={'4'} colorScheme={'violet'}>
+        <Button onPress={handleSubmit} mt={'4'} colorScheme={'amber'}>
           Enregistrer
         </Button>
       </VStack>

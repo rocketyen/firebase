@@ -9,6 +9,8 @@ import {
   VStack,
   Text,
   ScrollView,
+  HStack,
+  Link,
 } from 'native-base';
 import React from 'react';
 import {TouchableOpacity} from 'react-native';
@@ -22,6 +24,7 @@ import {createUserWithEmailAndPassword} from 'firebase/auth';
 import {collection, doc, setDoc, serverTimestamp} from 'firebase/firestore';
 
 import {auth, db} from '../firebase/config';
+import {useNavigation} from '@react-navigation/native';
 
 // schema de validation
 
@@ -42,6 +45,7 @@ const validationSchema = yup.object({
 });
 
 export default function RegistrationScreen() {
+  const navigation = useNavigation();
   // Récupération des props useFormik
   const {values, handleChange, handleBlur, handleSubmit, errors, touched} =
     useFormik({
@@ -89,7 +93,7 @@ export default function RegistrationScreen() {
       });
   };
   return (
-    <Center flex={'1'} bg={'light.200'}>
+    <Center flex="1">
       <ScrollView w="full">
         <Box w="95%" mx="auto" px="1">
           <Heading size="lg">Bienvenue !</Heading>
@@ -141,14 +145,25 @@ export default function RegistrationScreen() {
                 <Select.Item label="Je suis un collecteur" value="collector" />
               </Select>
             </FormControl>
-            <Button onPress={handleSubmit}>S'inscrire</Button>
+            <Button colorScheme='amber' onPress={handleSubmit}>
+              S'inscrire
+            </Button>
           </VStack>
+          <HStack mt="2" space="1.5">
+            <Text>Déjà inscrit ? </Text>
+            <Link
+              onPress={() => navigation.goBack()}
+              _text={{
+                color: 'amber.500',
+                fontWeight: 'medium',
+                fontSize: 'sm',
+              }}>
+              Se connecter
+            </Link>
+          </HStack>
           <Box mt="2" mb="5" flexDirection="row">
-            Déjà inscrit ?
             <TouchableOpacity>
-              <Text pl={'1.5'} color="primary.500">
-                Se connecter
-              </Text>
+              <Text pl={'1.5'} color="primary.500"></Text>
             </TouchableOpacity>
           </Box>
         </Box>

@@ -4,15 +4,23 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import LoginScreen from '../screens/LoginScreen';
 import RegistrationScreen from '../screens/RegistrationScreen';
 import TabNavigation from './TabNavigation';
+// context - gestion d'un state partagé
 import {AuthContext} from '../contexts/AuthContext';
 
+// header personnalisé
+import CustomHeader from '../components/CustomHeader';
+import DetailsScreen from '../screens/DetailsScreen';
+// react-navigation
 const Stack = createNativeStackNavigator();
 
 export default function RootNavigation() {
   const authContext = useContext(AuthContext);
   const {authenticated} = authContext;
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+      screenOptions={{
+        headerTitle: props => <CustomHeader {...props} />,
+      }}>
       {!authenticated ? (
         <Stack.Group>
           <Stack.Screen name="Login" component={LoginScreen} />
@@ -21,6 +29,7 @@ export default function RootNavigation() {
       ) : (
         <Stack.Group>
           <Stack.Screen name="Welcome" component={TabNavigation} />
+          <Stack.Screen name="Details" component={DetailsScreen} />
         </Stack.Group>
       )}
     </Stack.Navigator>

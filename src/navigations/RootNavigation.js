@@ -17,19 +17,40 @@ export default function RootNavigation() {
   const authContext = useContext(AuthContext);
   const {authenticated} = authContext;
   return (
-    <Stack.Navigator
-      screenOptions={{
-        headerTitle: props => <CustomHeader {...props} />,
-      }}>
+    <Stack.Navigator>
       {!authenticated ? (
         <Stack.Group>
-          <Stack.Screen name="Login" component={LoginScreen} />
-          <Stack.Screen name="Registration" component={RegistrationScreen} />
+          <Stack.Screen
+            name="Login"
+            component={LoginScreen}
+            options={{
+              headerTitle: props => <CustomHeader {...props} />,
+            }}
+          />
+          <Stack.Screen
+            name="Registration"
+            component={RegistrationScreen}
+            options={{
+              headerTitle: props => <CustomHeader {...props} />,
+            }}
+          />
         </Stack.Group>
       ) : (
         <Stack.Group>
-          <Stack.Screen name="Welcome" component={TabNavigation} />
-          <Stack.Screen name="Details" component={DetailsScreen} />
+          <Stack.Screen
+            name="Welcome"
+            component={TabNavigation}
+            options={{
+             headerShown: false
+            }}
+          />
+          <Stack.Screen
+            name="Details"
+            component={DetailsScreen}
+            options={{
+              headerTitle: props => <CustomHeader {...props} />,
+            }}
+          />
         </Stack.Group>
       )}
     </Stack.Navigator>

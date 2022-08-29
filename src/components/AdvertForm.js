@@ -89,7 +89,7 @@ export default function AdvertForm() {
     // le merge est import sinon, les colonnes non présente dans values seront écrasées de la nouvelle version du document.
     // j'ai ajouté la colonne updatedAt pour avoir une date de dernière modification
     setDoc(
-      advertsRef,
+      advertsDocRef,
       {
         ...values,
         updatedAt: serverTimestamp(),
@@ -103,9 +103,9 @@ export default function AdvertForm() {
   };
 
   return (
-    <Box>
-      <Heading>Nouvel annonce</Heading>
-      <VStack>
+    <Box p={5}>
+      <Heading>Nouvelle annonce</Heading>
+      <VStack space={2}>
         <FormControl>
           <FormControl.Label>Titre</FormControl.Label>
           <Input value={values.title} onChangeText={handleChange('title')} />

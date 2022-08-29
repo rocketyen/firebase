@@ -6,8 +6,8 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 // Mes écrans
 import CreateAdvertScreen from '../screens/CreateAdvertScreen';
 import HomeScreen from '../screens/HomeScreen';
-import AccountScreen from '../screens/AccountScreen';
 import {useTheme} from 'native-base';
+import DrawerNavigation from './DrawerNavigation';
 
 const Tab = createBottomTabNavigator();
 
@@ -33,6 +33,7 @@ export default function TabNavigation() {
         tabBarActiveTintColor: theme.colors.amber[500],
         tabBarInactiveTintColor: 'gray',
         headerShown: false,
+        tabBarHideOnKeyboard: true,
         tabBarStyle: {
           paddingTop: 2,
         },
@@ -52,7 +53,7 @@ export default function TabNavigation() {
       />
       <Tab.Screen
         name="Account"
-        component={AccountScreen}
+        component={DrawerNavigation}
         options={{title: 'Mon compte'}}
       />
     </Tab.Navigator>

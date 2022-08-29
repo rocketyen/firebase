@@ -28,7 +28,7 @@ import 'dayjs/locale/fr';
 
 import relativeTime from 'dayjs/plugin/relativeTime';
 import updateLocale from 'dayjs/plugin/updateLocale';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 
 dayjs.locale('fr');
 dayjs.extend(relativeTime);
@@ -60,10 +60,28 @@ export default function HomeScreen() {
 
   useEffect(() => {
     const advertsRef = collection(db, 'adverts');
-    getDocs(advertsRef)
-      .then(querySnapShot => {
-        const advertsArray = [];
+    // getDocs(advertsRef)
+    //   .then(querySnapShot => {
+    //     const advertsArray = [];
 
+    //     querySnapShot.forEach(doc => {
+    //       advertsArray.push({
+    //         ...doc.data(),
+    //         id: doc.id,
+    //       });
+    //     });
+    //     setAdverts(advertsArray);
+    //   })
+    //   .catch(e => {
+    //     console.log(e.message);
+    //   })
+    //   .finally(() => {
+    //     setLoading(false);
+    //   });
+    const unsubscribe = onSnapshot(
+      advertsRef,
+      querySnapShot => {
+        const advertsArray = [];
         querySnapShot.forEach(doc => {
           advertsArray.push({
             ...doc.data(),
@@ -71,23 +89,26 @@ export default function HomeScreen() {
           });
         });
         setAdverts(advertsArray);
-      })
-      .catch(e => {
-        console.log(e.message);
-      })
-      .finally(() => {
         setLoading(false);
-      });
+      },
+      error => {
+        console.log(error.message);
+      },
+    );
+    return () => unsubscribe();
   }, []);
 
   const renderItem = ({item}) => (
-    <Pressable onPress={() =>  navigation.navigate('Details') }>
-      <Box py="1.5">
+    <Pressable onPress={() => navigation.navigate('Details')}>
+      <Divider />
+      <Box p="3">
         <VStack space="2">
-          <Heading>{item.title}</Heading>
+          <Heading isTruncated size="sm">
+            {item.title}
+          </Heading>
           <HStack alignItems="center" space="2">
             <Icon as={IonIcons} name="md-time-outline" />
-            <Text>{dayjs(item.createdAt.toDate()).fromNow()}</Text>
+            <Text>{dayjs(item.createdAt?.toDate())?.fromNow()}</Text>
           </HStack>
         </VStack>
       </Box>
@@ -98,12 +119,15 @@ export default function HomeScreen() {
     <ActivityIndicator size="large" />
   ) : (
     <Box px={'2'}>
-      <Heading>Les dernières annonces</Heading>
+      <Heading mt="2" textTransform="uppercase">
+        Derniers dons
+      </Heading>
       <FlatList
         data={adverts}
         keyExtractor={item => item.id}
         ItemSeparatorComponent={Divider}
         renderItem={renderItem}
+        ListEmptyComponent={() => <Text my="5">Aucun don n'est trouvé !</Text>}
       />
     </Box>
   );

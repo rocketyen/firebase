@@ -53,7 +53,7 @@ const DrawerContent = props => {
             }}>
             AC
           </Avatar>
-          <Text>johndoe@email.com</Text>
+          <Text>{auth.currentUser.email}</Text>
         </Box>
         <VStack divider={<Divider />} space="4" flexGrow={1}>
           <VStack space={4}>

@@ -45,13 +45,12 @@ const DrawerContent = props => {
       <VStack space="6" p={5} flex={1}>
         <Box>
           <Avatar
-            bg={'amber.500'}
+            bg={'blue.500'}
             size="lg"
             mb={3}
             source={{
-              uri: null,
+              uri: 'https://icon-library.com/images/avatar-icon-images/avatar-icon-images-4.jpg',
             }}>
-            AC
           </Avatar>
           <Text>{auth.currentUser.email}</Text>
         </Box>
@@ -72,7 +71,7 @@ const DrawerContent = props => {
           </VStack>
         </VStack>
         <HStack alignItems={'center'} space={3}>
-          <Icon as={IonIcons} name="md-log-out-outline" color={'amber.500'} />
+          <Icon as={IonIcons} name="md-log-out-outline" color={'blue.500'} />
           <Pressable onPress={handleLogout}>
             <Text>Déconnexion</Text>
           </Pressable>

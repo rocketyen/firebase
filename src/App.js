@@ -20,7 +20,7 @@ const customTheme = extendTheme({
     Input: {
       defaultProps: {
         _focus: {
-          borderColor: 'amber.500',
+          borderColor: 'blue.500',
         },
       },
     },

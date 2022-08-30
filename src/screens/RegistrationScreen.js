@@ -145,7 +145,7 @@ export default function RegistrationScreen() {
                 <Select.Item label="Je suis un collecteur" value="collector" />
               </Select>
             </FormControl>
-            <Button colorScheme='amber' onPress={handleSubmit}>
+            <Button colorScheme='blue' onPress={handleSubmit}>
               S'inscrire
             </Button>
           </VStack>
@@ -154,7 +154,7 @@ export default function RegistrationScreen() {
             <Link
               onPress={() => navigation.goBack()}
               _text={{
-                color: 'amber.500',
+                color: 'blue.500',
                 fontWeight: 'medium',
                 fontSize: 'sm',
               }}>

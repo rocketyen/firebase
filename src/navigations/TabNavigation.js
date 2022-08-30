@@ -30,7 +30,7 @@ export default function TabNavigation() {
           // You can return any component that you like here!
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: theme.colors.amber[500],
+        tabBarActiveTintColor: theme.colors.blue[500],
         tabBarInactiveTintColor: 'gray',
         headerShown: false,
         tabBarHideOnKeyboard: true,

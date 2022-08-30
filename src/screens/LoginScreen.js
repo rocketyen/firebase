@@ -28,8 +28,8 @@ export default function LoginScreen() {
   const {values, handleChange, handleBlur, handleSubmit, errors, touched} =
     useFormik({
       initialValues: {
-        email: 'johndoe@gmail.com',
-        password: 'Secret123',
+        email: 'rocketyen@gmail.com',
+        password: '123456',
       },
       onSubmit: values => login(values),
     });
@@ -61,7 +61,7 @@ export default function LoginScreen() {
               onChangeText={handleChange('password')}
             />
           </FormControl>
-          <Button onPress={handleSubmit} colorScheme={'amber'}>
+          <Button onPress={handleSubmit} colorScheme={'blue'}>
             Se connecter
           </Button>
           <HStack justifyContent={'center'} mt="3">
@@ -69,7 +69,7 @@ export default function LoginScreen() {
             <Link
               onPress={() => navigation.navigate('Registration')}
               _text={{
-                color: 'amber.500',
+                color: 'blue.500',
                 fontWeight: 'medium',
                 fontSize: 'sm',
               }}>

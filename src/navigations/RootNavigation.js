@@ -31,7 +31,7 @@ export default function RootNavigation() {
             name="Registration"
             component={RegistrationScreen}
             options={{
-              headerTitle: props => <CustomHeader {...props} />,
+            headerTitle: props => <CustomHeader {...props} />,
             }}
           />
         </Stack.Group>
@@ -41,7 +41,7 @@ export default function RootNavigation() {
             name="Welcome"
             component={TabNavigation}
             options={{
-             headerShown: false
+            headerShown: false
             }}
           />
           <Stack.Screen

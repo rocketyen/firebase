@@ -152,7 +152,7 @@ export default function AdvertForm() {
             value: new Date(),
             onChange: expirationDateChange,
           })}
-        <Button onPress={handleSubmit} mt={'4'} colorScheme={'amber'}>
+        <Button onPress={handleSubmit} mt={'4'} colorScheme={'blue'}>
           Enregistrer
         </Button>
       </VStack>

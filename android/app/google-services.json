@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "31324684989",
+    "project_id": "profound-veld-357709",
+    "storage_bucket": "profound-veld-357709.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:31324684989:android:4f73f5d36164612a352dd4",
+        "android_client_info": {
+          "package_name": "com.firebaseproject"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "31324684989-blm5v7s8cv676gegif2lioflejvva826.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBH3CUOAEx0zCwozDsNufVl69l1Yo5iJ2k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "31324684989-blm5v7s8cv676gegif2lioflejvva826.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

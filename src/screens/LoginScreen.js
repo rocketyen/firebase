@@ -19,6 +19,17 @@ import {signInWithEmailAndPassword} from '@firebase/auth';
 import {AuthContext} from './../contexts/AuthContext';
 import {useFormik} from 'formik';
 
+import { Alert, TouchableOpacity, View } from 'react-native';
+
+import TouchID from 'react-native-touch-id';
+
+const optionalConfigObject = {
+  title: "Authentification requise", // Android
+  color: "blue", // Android,
+  fallbackLabel: "Show Passcode" // iOS (if empty, then label is hidden)
+}
+
+
 export default function LoginScreen() {
   const navigation = useNavigation();
 
@@ -42,7 +53,32 @@ export default function LoginScreen() {
       setAuthenticated(true);
     });
   };
-  console.log(values);
+
+  touchIdAuth = () => {
+    TouchID.isSupported()
+      .then(biometryType => {
+        // Success code
+        if (biometryType === 'FaceID') {
+          console.log('FaceID is supported.');
+        } else {
+          console.log('TouchID is supported.');
+          TouchID.authenticate("", optionalConfigObject)
+            .then(success => {
+              Alert.alert('Authentification réussie');
+            })
+            .catch(error => {
+              Alert.alert('Authentification échoué');
+            });
+        }
+      })
+      .catch(error => {
+        // Failure code
+        console.log(error);
+      });
+  }
+
+
+  // console.log(values);
   return (
     <Center flex={'1'} bgColor="warmGray.5">
       <Box w={'90%'}>
@@ -76,6 +112,11 @@ export default function LoginScreen() {
               Créer un compte
             </Link>
           </HStack>
+          <View style={{justifyContent:'center',flex:1,alignSelf:'center'}}>
+            <TouchableOpacity style={{flexWrap:'wrap'}}>
+              <Button title="Authentification" onPress={this.touchIdAuth.bind(this)}/>
+            </TouchableOpacity>
+          </View>          
         </VStack>
       </Box>
     </Center>

@@ -50,7 +50,7 @@ export default function UserDashboard() {
       </VStack>
     </Pressable>
   );
-  console.log(adverts, 'gjfkhgkhj')
+  // console.log(adverts, 'gjfkhgkhj')
   return (
     <Box flex={1} p={2}>
       <Heading size="md">Mes annonces</Heading>

@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
@@ -20,23 +20,64 @@ import {
 import IonIcons from 'react-native-vector-icons/Ionicons';
 import {AuthContext} from '../contexts/AuthContext';
 
-import {signOut} from 'firebase/auth';
-import {auth} from '../firebase/config';
+// import {signOut} from 'firebase/auth';
+import auth from '@react-native-firebase/auth';
 
 const Drawer = createDrawerNavigator();
 
 const DrawerContent = props => {
+  const [checked, setChecked] = useState(false);
   const authContext = useContext(AuthContext);
   const {setAuthenticated} = authContext;
 
   const handleLogout = () => {
-    signOut(auth).then(userCredential => {
-      setAuthenticated(false);
-      console.log('====================================');
-      console.log('déconnexion réussie');
-      console.log('====================================');
-    });
+    auth()
+      .signOut()
+      .then(userCredential => {
+        setAuthenticated(false);
+        console.log('====================================');
+        console.log('déconnexion réussie');
+        console.log('====================================');
+      });
   };
+
+  const getData = async () => {
+    try {
+      const value = await AsyncStorage.getItem('@userAuth');
+      if (value !== null) {
+        setChecked(true);
+      }
+    } catch (e) {
+      // error reading value
+      console.log('====================================');
+      console.log(e.message);
+      console.log('====================================');
+    }
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  const handleSwichChange = async () => {
+    try {
+      if (!checked) {
+        console.log('allumé');
+        await AsyncStorage.setItem('@userAuth', 'true');
+        setChecked(true);
+      } else {
+        console.log('eteint');
+        await AsyncStorage.removeItem('@userAuth');
+        setChecked(false);
+      }
+    } catch (e) {
+      // error reading value
+      console.log('====================================');
+      console.log(e.message);
+      console.log('====================================');
+    }
+  };
+
   return (
     <DrawerContentScrollView
       contentContainerStyle={{
@@ -44,15 +85,17 @@ const DrawerContent = props => {
       }}>
       <VStack space="6" p={5} flex={1}>
         <Box>
-          <Avatar
+        <Avatar
             bg={'blue.500'}
             size="lg"
             mb={3}
             source={{
-              uri: 'https://icon-library.com/images/avatar-icon-images/avatar-icon-images-4.jpg',
-            }}>
+              uri: auth().currentUser.photoURL,
+            }}
+          >
+            AC
           </Avatar>
-          <Text>{auth.currentUser.email}</Text>
+          <Text>{auth().currentUser.email}</Text>
         </Box>
         <VStack divider={<Divider />} space="4" flexGrow={1}>
           <VStack space={4}>

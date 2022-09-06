@@ -11,19 +11,21 @@ import {
   ScrollView,
   HStack,
   Link,
+  useToast,
 } from 'native-base';
 import React from 'react';
-import {TouchableOpacity} from 'react-native';
 
 // formik
 import {useFormik} from 'formik';
 import * as yup from 'yup';
 
 // firebase imports
-import {createUserWithEmailAndPassword} from 'firebase/auth';
-import {collection, doc, setDoc, serverTimestamp} from 'firebase/firestore';
+// import {createUserWithEmailAndPassword} from 'firebase/auth';
+import auth from '@react-native-firebase/auth';
+// import {collection, doc, setDoc, serverTimestamp} from 'firebase/firestore';
+import firestore from '@react-native-firebase/firestore';
 
-import {auth, db} from '../firebase/config';
+// import {auth, db} from '../firebase/config';
 import {useNavigation} from '@react-navigation/native';
 
 // schema de validation
@@ -45,6 +47,9 @@ const validationSchema = yup.object({
 });
 
 export default function RegistrationScreen() {
+  // Toast de notification
+  const toast = useToast();
+
   const navigation = useNavigation();
   // Récupération des props useFormik
   const {values, handleChange, handleBlur, handleSubmit, errors, touched} =
@@ -58,6 +63,7 @@ export default function RegistrationScreen() {
         role: '',
       },
       onSubmit: values => signIn(values),
+      validationSchema,
     });
   const signIn = values => {
     /**
@@ -66,30 +72,29 @@ export default function RegistrationScreen() {
      */
     const {email, password} = values;
     // Condition de connexion ok
-    createUserWithEmailAndPassword(auth, email.trim(), password.trim())
+    auth()
+      .createUserWithEmailAndPassword(email.trim(), password.trim())
       .then(userCredential => {
         const user = userCredential.user;
         const id = user.uid;
-        // récupérer la collection
-        const userCollRef = collection(db, 'users');
-        // on récupère le doc qui à l'id de l'utilisateur. Il le crée s'il n'existe pas.
-        const userDoc = doc(userCollRef, id);
         delete values.password;
         delete values.confirmPassword;
 
-        console.log(values);
-        // on modifit et persiste les données dans firestore
-        setDoc(userDoc, {
-          ...values,
-          createdAt: serverTimestamp(),
-        }).then(userCredential => {
-          console.log('user created!');
-        });
-        console.log(user);
-        // on appelle firestore pour persister une version de notre user avec plus d'info
-      })
-      .catch(error => {
-        console.log(error.message);
+        firestore()
+          .collection('users')
+          .doc(id)
+          .set({
+            ...values,
+            createdAt: firestore.FieldValue.serverTimestamp(),
+          })
+          .then(userCredential => {
+            toast.show({
+              description: 'Compte créé avec succès !',
+            });
+          })
+          .catch(error => {
+            console.log(error.message);
+          });
       });
   };
   return (
@@ -101,51 +106,71 @@ export default function RegistrationScreen() {
             Pour commencer, créer un votre compte
           </Text>
           <VStack space={2}>
-            <FormControl>
+            <FormControl isInvalid={touched.email && errors?.email}>
               <FormControl.Label>Email</FormControl.Label>
               <Input
                 value={values.email}
                 onChangeText={handleChange('email')}
               />
+              <FormControl.ErrorMessage>
+                {errors?.email}
+              </FormControl.ErrorMessage>
             </FormControl>
-            <FormControl>
+            <FormControl isInvalid={touched.password && errors?.password}>
               <FormControl.Label>Mot de passe</FormControl.Label>
               <Input
                 value={values.password}
                 onChangeText={handleChange('password')}
               />
+              <FormControl.ErrorMessage>
+                {errors?.password}
+              </FormControl.ErrorMessage>
             </FormControl>
             <FormControl>
-              <FormControl.Label>
+              <FormControl.Label
+                isInvalid={touched.confirmPassword && errors?.confirmPassword}
+              >
                 Confirmation du mot de passe
               </FormControl.Label>
               <Input
                 value={values.confirmPassword}
                 onChangeText={handleChange('confirmPassword')}
               />
+              <FormControl.ErrorMessage>
+                {errors?.confirmPassword}
+              </FormControl.ErrorMessage>
             </FormControl>
-            <FormControl>
+            <FormControl isInvalid={touched.firstname && errors?.firstname}>
               <FormControl.Label>Prénom</FormControl.Label>
               <Input
                 value={values.firstname}
                 onChangeText={handleChange('firstname')}
               />
+              <FormControl.ErrorMessage>
+                {errors?.firstname}
+              </FormControl.ErrorMessage>
             </FormControl>
-            <FormControl>
+            <FormControl isInvalid={touched.lastname && errors?.lastname}>
               <FormControl.Label>Nom</FormControl.Label>
               <Input
                 value={values.lastname}
                 onChangeText={handleChange('lastname')}
               />
+              <FormControl.ErrorMessage>
+                {errors?.lastname}
+              </FormControl.ErrorMessage>
             </FormControl>
-            <FormControl>
+            <FormControl isInvalid={touched.role && errors?.role}>
               <FormControl.Label>Rôle</FormControl.Label>
               <Select onValueChange={handleChange('role')}>
                 <Select.Item label="Je suis un donateur" value="donor" />
                 <Select.Item label="Je suis un collecteur" value="collector" />
               </Select>
+              <FormControl.ErrorMessage>
+                {errors?.role}
+              </FormControl.ErrorMessage>
             </FormControl>
-            <Button colorScheme='blue' onPress={handleSubmit}>
+            <Button colorScheme="blue" onPress={handleSubmit}>
               S'inscrire
             </Button>
           </VStack>
@@ -161,11 +186,6 @@ export default function RegistrationScreen() {
               Se connecter
             </Link>
           </HStack>
-          <Box mt="2" mb="5" flexDirection="row">
-            <TouchableOpacity>
-              <Text pl={'1.5'} color="primary.500"></Text>
-            </TouchableOpacity>
-          </Box>
         </Box>
       </ScrollView>
     </Center>

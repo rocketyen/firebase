@@ -2,7 +2,8 @@ import {View, Text, Pressable} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {collection, getDocs, query, where} from 'firebase/firestore';
 
-import {db, auth} from '../firebase/config';
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 import {Box, Divider, FlatList, Heading, VStack} from 'native-base';
 
 import dayjs from 'dayjs';
@@ -17,29 +18,31 @@ export default function UserDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const user_id = auth.currentUser.uid;
-    const advertColRef = collection(db, 'adverts');
+    // const user_id = auth.currentUser.uid;
+    const user_id = auth().currentUser.uid;
 
-    const q = query(advertColRef, where('user_id', '==', user_id));
-
-    getDocs(q)
-      .then(querySnapshot => {
-        const advertsArray = [];
-        querySnapshot.forEach(doc => {
-          advertsArray.push({
-            ...doc.data(),
-            id: doc.id,
+    const subscriber = firestore()
+      .collection('adverts')
+      .where('user_id', '==', user_id)
+      .onSnapshot(
+        querySnapshot => {
+          const advertsArray = [];
+          querySnapshot.forEach(doc => {
+            advertsArray.push({
+              ...doc.data(),
+              id: doc.id,
+            });
           });
-        });
-        setAdverts(advertsArray);
-      })
-      .catch(e => {
-        console.log(e.massage);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
+          setAdverts(advertsArray);
+          setLoading(false);
+        },
+        error => {
+          console.log(error.massage);
+        },
+      );
+      return () => subscriber();
+    }, []);
+
   const renderItem = ({item}) => (
     <Pressable>
       <Divider />

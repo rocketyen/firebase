@@ -18,9 +18,16 @@ import {
 // react-native-vector-icons
 import IonIcons from 'react-native-vector-icons/Ionicons';
 
-// firebase
-import {collection, getDocs, onSnapshot} from 'firebase/firestore';
-import {db} from '../firebase/config';
+/********************************************************
+ * FIREBASE
+ ********************************************************/
+// firestore
+// import {collection, onSnapshot} from 'firebase/firestore';
+import firestore from '@react-native-firebase/firestore';
+// google firestore cloud messaging
+import messaging from '@react-native-firebase/messaging';
+// firebase auth
+import auth from '@react-native-firebase/auth';
 
 // dayjs - manipulation de date
 import dayjs from 'dayjs';
@@ -29,6 +36,7 @@ import 'dayjs/locale/fr';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import updateLocale from 'dayjs/plugin/updateLocale';
 import {useNavigation} from '@react-navigation/native';
+import {VAPID_KEY} from '../constants';
 
 dayjs.locale('fr');
 dayjs.extend(relativeTime);
@@ -58,62 +66,132 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
 
-  useEffect(() => {
-    const advertsRef = collection(db, 'adverts');
-    // getDocs(advertsRef)
-    //   .then(querySnapShot => {
-    //     const advertsArray = [];
+  const requestUserPermission = async () => {
+    const authStatus = await messaging().requestPermission();
+    const enabled =
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
-    //     querySnapShot.forEach(doc => {
-    //       advertsArray.push({
-    //         ...doc.data(),
-    //         id: doc.id,
-    //       });
-    //     });
-    //     setAdverts(advertsArray);
-    //   })
-    //   .catch(e => {
-    //     console.log(e.message);
-    //   })
-    //   .finally(() => {
-    //     setLoading(false);
-    //   });
-    const unsubscribe = onSnapshot(
-      advertsRef,
-      querySnapShot => {
-        const advertsArray = [];
-        querySnapShot.forEach(doc => {
-          advertsArray.push({
-            ...doc.data(),
-            id: doc.id,
+    return enabled;
+  };
+
+  const isNotifiable = async userRef => {
+    const querySnap = await userRef.get();
+    const userData = querySnap.data();
+    if (userData.role === 'collector') {
+      return true;
+    }
+    return false;
+  };
+
+  useEffect(() => {
+    const subscriber = firestore()
+      .collection('adverts')
+      .onSnapshot(
+        querySnapShot => {
+          const advertsArray = [];
+          querySnapShot.forEach(doc => {
+            advertsArray.push({
+              ...doc.data(),
+              id: doc.id,
+            });
           });
-        });
-        setAdverts(advertsArray);
-        setLoading(false);
-      },
-      error => {
-        console.log(error.message);
-      },
-    );
-    return () => unsubscribe();
+          setAdverts(advertsArray);
+          setLoading(false);
+        },
+        error => {
+          console.log(error.message);
+        },
+      );
+    return () => subscriber();
   }, []);
 
-  const renderItem = ({item}) => (
-    <Pressable onPress={() => navigation.navigate('Details')}>
-      <Divider />
-      <Box p="3">
-        <VStack space="2">
-          <Heading isTruncated size="sm">
-            {item.title}
-          </Heading>
-          <HStack alignItems="center" space="2">
-            <Icon as={IonIcons} name="md-time-outline" />
-            <Text>{dayjs(item.createdAt?.toDate())?.fromNow()}</Text>
-          </HStack>
-        </VStack>
-      </Box>
-    </Pressable>
-  );
+  useEffect(() => {
+    const asyncBootstrap = async () => {
+      const userDocID = auth().currentUser.uid;
+      const userRef = firestore().collection('users').doc(userDocID);
+      // status de l'utilisateur et auth
+      const checkIsNotifiable = await isNotifiable(userRef);
+      const checkPermission = await requestUserPermission();
+      console.log(checkPermission);
+      // Utilisateur est notifiable et à donner son accord
+      if (checkIsNotifiable && checkPermission) {
+        await messaging().registerDeviceForRemoteMessages();
+        // on récupère le jeton unique FCM pour l'utilisateur
+        const fcmToken = await messaging().getToken();
+        console.log(fcmToken);
+        // On persiste l'identifiant unique de l'utilisateur courant
+        userRef.update({
+          fcmToken: fcmToken,
+        });
+      }
+    };
+      asyncBootstrap();
+    }, []);
+
+    const renderItem = ({item}) => (
+      <Pressable onPress={() => navigation.navigate('Details')}>
+        <Divider />
+        <Box
+          p="3"
+          _dark={{
+            bg: 'coolGray.800',
+          }}
+          _light={{
+            bg: 'white',
+          }}
+        >
+          <VStack space="2">
+            <Heading isTruncated size="sm">
+              {item.title}
+            </Heading>
+            <HStack alignItems="center" space="2">
+              <Icon as={IonIcons} name="md-time-outline" />
+              <Text>{dayjs(item?.createdAt?.toDate())?.fromNow()}</Text>
+            </HStack>
+          </VStack>
+        </Box>
+      </Pressable>
+    );
+
+  // useEffect(() => {
+  //   const advertsRef = collection(db, 'adverts');
+  //   const unsubscribe = onSnapshot(
+  //     advertsRef,
+  //     querySnapShot => {
+  //       const advertsArray = [];
+  //       querySnapShot.forEach(doc => {
+  //         advertsArray.push({
+  //           ...doc.data(),
+  //           id: doc.id,
+  //         });
+  //       });
+  //       setAdverts(advertsArray);
+  //       setLoading(false);
+  //     },
+  //     error => {
+  //       console.log(error.message);
+  //     },
+  //   );
+  //   return () => unsubscribe();
+  // }, []);
+
+  // const renderItem = ({item}) => (
+  //   <Pressable onPress={() => navigation.navigate('Details')}>
+  //     <Divider />
+  //     <Box p="3">
+  //       <VStack space="2">
+  //         <Heading isTruncated size="sm">
+  //           {item.title}
+  //         </Heading>
+  //         <HStack alignItems="center" space="2">
+  //           <Icon as={IonIcons} name="md-time-outline" />
+  //           <Text>{dayjs(item.createdAt?.toDate())?.fromNow()}</Text>
+  //         </HStack>
+  //       </VStack>
+  //     </Box>
+  //   </Pressable>
+  // );
 
   return loading ? (
     <ActivityIndicator size="large" />

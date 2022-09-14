@@ -123,7 +123,7 @@ export default function HomeScreen() {
         // On persiste l'identifiant unique de l'utilisateur courant
         userRef.update({
           fcmToken: fcmToken,
-        });
+        }); 
       }
     };
       asyncBootstrap();
